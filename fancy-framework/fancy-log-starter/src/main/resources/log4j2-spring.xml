@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <!-- 公共属性 -->
+    <Properties>
+        <!-- 日志格式: 时间 等级 线程ID 线程名 Logger名称 : traceId 日志内容 -->
+        <Property name="LOG_PATTERN">
+            %d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%-5level} %style{%pid}{magenta} --- [%t] %style{%logger{36}}{cyan} : %X{traceId} %msg%n
+        </Property>
+        <!-- 日志目录, 默认 logs -->
+        <Property name="LOG_PATH">${spring:logging.file.path:-logs}</Property>
+        <!-- 日志文件名, 默认 fancy -->
+        <Property name="LOG_FILE_NAME">${spring:logging.file.name:-fancy}</Property>
+        <!-- 根日志级别, 默认 info -->
+        <Property name="LOG_LEVEL">${spring:logging.level.root:-info}</Property>
+    </Properties>
+
+    <!-- 日志输出器 -->
+    <Appenders>
+        <!-- 控制台输出 -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}" disableAnsi="false"/>
+        </Console>
+
+        <!-- 滚动文件 -->
+        <RollingFile name="RollingFile"
+                     fileName="${LOG_PATH}/${LOG_FILE_NAME}.log"
+                     filePattern="${LOG_PATH}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <!-- 每天新建日志文件 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <!-- 每个文件最大 128MB 后滚动 -->
+                <SizeBasedTriggeringPolicy size="128MB"/>
+            </Policies>
+            <!-- 最多保留 7 个历史文件 -->
+            <DefaultRolloverStrategy max="7"/>
+        </RollingFile>
+
+        <!-- 异步日志, 需要 disruptor 依赖 -->
+        <Async name="Async" bufferSize="8192">
+            <AppenderRef ref="RollingFile"/>
+        </Async>
+    </Appenders>
+
+    <!-- 日志记录器 -->
+    <Loggers>
+        <!-- 第三方框架日志降级处理 -->
+        <Logger name="org.springframework" level="warn"/>
+
+        <!--  默认日志输出 -->
+        <Root level="${LOG_LEVEL}">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="Async"/>
+        </Root>
+    </Loggers>
+
+    <!-- 开发环境配置 -->
+    <SpringProfile name="dev">
+        <Loggers>
+            <Root level="${LOG_LEVEL}">
+                <AppenderRef ref="Console"/>
+            </Root>
+        </Loggers>
+    </SpringProfile>
+
+    <!-- 生产环境配置 -->
+    <SpringProfile name="prod">
+        <Loggers>
+            <Root level="${LOG_LEVEL}">
+                <AppenderRef ref="Async"/>
+            </Root>
+        </Loggers>
+    </SpringProfile>
+</Configuration>
