@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>fan</groupId>
+        <artifactId>fancy-dependencies</artifactId>
+        <version>2.1.1</version>
+        <relativePath/>
+    </parent>
+    <artifactId>fancy-platform</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>fancy-platform</name>
+    <description>Microservices development platform.</description>
+    <url>https://github.com/Fan223/fancy-platform</url>
+    <inceptionYear>2025</inceptionYear>
+    <licenses>
+        <license/>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>Fan</id>
+            <name>Fancy</name>
+            <email>fanj.zh@foxmail.com</email>
+            <url>https://fan223.cn</url>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:https://github.com/Fan223/fancy-platform.git</connection>
+        <developerConnection>scm:git:git@github.com:Fan223/fancy-platform.git</developerConnection>
+        <url>https://github.com/Fan223/fancy-platform</url>
+        <tag/>
+    </scm>
+
+    <modules>
+        <module>fancy-common</module>
+        <module>fancy-framework</module>
+        <module>fancy-platform-core</module>
+    </modules>
+</project>
