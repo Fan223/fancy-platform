@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>fan</groupId>
+    <artifactId>fancy-dependencies</artifactId>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
+
+    <name>fancy-dependencies</name>
+    <description>Fancy-Dependencies</description>
+    <url>https://github.com/Fan223/fancy-dependencies</url>
+    <inceptionYear>2022</inceptionYear>
+    <licenses>
+        <license/>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>Fan</id>
+            <name>Fancy</name>
+            <email>fanj.zh@foxmail.com</email>
+            <url>https://fan223.cn</url>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:https://github.com/Fan223/fancy-dependencies.git</connection>
+        <developerConnection>scm:git:git@github.com:Fan223/fancy-dependencies.git</developerConnection>
+        <url>https://github.com/Fan223/fancy-dependencies</url>
+    </scm>
+
+    <modules>
+        <module>fancy-bom</module>
+        <module>fancy-parent</module>
+    </modules>
+
+    <properties>
+        <revision>4.0.3</revision>
+        <versions-maven-plugin.version>2.21.0</versions-maven-plugin.version>
+        <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${versions-maven-plugin.version}</version>
+                <configuration>
+                    <allowSnapshots>false</allowSnapshots>
+                    <ignoredVersions>
+                        <ignoredVersion>.*.(?i)(alpha|beta|rc|m).*</ignoredVersion>
+                    </ignoredVersions>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>${flatten-maven-plugin.version}</version>
+
+                <configuration>
+                    <flattenMode>bom</flattenMode>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten-clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
