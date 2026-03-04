@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>fan</groupId>
-        <artifactId>fancy-dependencies</artifactId>
+        <artifactId>fancy-bom</artifactId>
         <version>${revision}</version>
     </parent>
     <artifactId>fancy-parent</artifactId>
