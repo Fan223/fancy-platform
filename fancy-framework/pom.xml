@@ -1,0 +1,23 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>fan</groupId>
+        <artifactId>fancy-platform</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <artifactId>fancy-framework</artifactId>
+    <packaging>pom</packaging>
+    <name>fancy-framework</name>
+
+    <modules>
+        <module>fancy-admin-client-starter</module>
+        <module>fancy-jackson-starter</module>
+        <module>fancy-log-starter</module>
+        <module>fancy-mybatis-plus-starter</module>
+        <module>fancy-redis-starter</module>
+        <module>fancy-resource-server-starter</module>
+        <module>fancy-validation-starter</module>
+        <module>fancy-web-starter</module>
+    </modules>
+</project>

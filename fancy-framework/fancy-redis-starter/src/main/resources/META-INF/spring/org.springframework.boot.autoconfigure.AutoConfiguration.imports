@@ -1,0 +1,2 @@
+fan.fancy.starter.redis.autoconfigure.FancyRedisAutoConfiguration
+fan.fancy.starter.redis.service.FancyRedisService

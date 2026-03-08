@@ -1,0 +1,57 @@
+package fan.fancy.server.authorization.handler;
+
+import fan.fancy.toolkit.http.Response;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
+import tools.jackson.databind.json.JsonMapper;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+/**
+ * 认证入口点, 处理未认证访问时的异常.
+ *
+ * @author Fan
+ */
+@Component
+@AllArgsConstructor
+@Slf4j
+public class FancyAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+    private final JsonMapper jsonMapper;
+
+    private final LoginUrlAuthenticationEntryPoint loginUrlAuthenticationEntryPoint = new LoginUrlAuthenticationEntryPoint("/login");
+
+    @Override
+    public void commence(HttpServletRequest request, @NonNull HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        String message = authException.getMessage();
+        log.error("FancyAuthenticationEntryPoint: {}", message);
+
+        // 判断请求是否来自浏览器
+        boolean isBrowser = "GET".equals(request.getMethod())
+                && request.getHeader("Accept") != null
+                && request.getHeader("Accept").contains(MediaType.TEXT_HTML_VALUE);
+        if (isBrowser) {
+            log.info("text");
+            loginUrlAuthenticationEntryPoint.commence(request, response, authException);
+        } else {
+            log.info("json");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding(StandardCharsets.UTF_8);
+            response.setHeader(HttpHeaders.WWW_AUTHENTICATE, message);
+
+            jsonMapper.writeValue(response.getOutputStream(), Response.fail(message));
+        }
+    }
+}

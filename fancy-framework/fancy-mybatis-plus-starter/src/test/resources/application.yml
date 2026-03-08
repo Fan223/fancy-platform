@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:test_db
+    username: sa
+  sql:
+    init:
+      mode: always
+      schema-locations: schema.sql
+      data-locations: data.sql
