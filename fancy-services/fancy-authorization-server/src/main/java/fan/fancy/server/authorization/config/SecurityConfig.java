@@ -28,7 +28,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http.authorizeHttpRequests(registry -> registry
-                .requestMatchers("/api/**", "/login", "/assets/**", "/error").permitAll()
+                .requestMatchers("/api/**", "/login", "/assets/**", "/favicon.ico", "/error").permitAll()
                 .anyRequest().authenticated());
 
         http.cors(Customizer.withDefaults())

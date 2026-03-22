@@ -8,6 +8,7 @@ import fan.fancy.server.authorization.handler.FancyAuthenticationEntryPoint;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
@@ -18,13 +19,14 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationConsentService;
-import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
+import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
+import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
@@ -33,6 +35,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -91,19 +94,35 @@ public class AuthorizationServerConfig {
     }
 
     @Bean
-    public RegisteredClientRepository registeredClientRepository() {
+    public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
+        JdbcRegisteredClientRepository registeredClientRepository = new JdbcRegisteredClientRepository(jdbcTemplate);
+
+        TokenSettings tokenSettings = TokenSettings.builder()
+                .accessTokenTimeToLive(Duration.ofHours(1))
+                .reuseRefreshTokens(Boolean.TRUE)
+                .refreshTokenTimeToLive(Duration.ofDays(7))
+                .build();
+        ClientSettings clientSettings = ClientSettings.builder()
+                .requireAuthorizationConsent(Boolean.TRUE)
+                .build();
+
         RegisteredClient oidcClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("fancy-gateway")
                 .clientSecret("{noop}123456")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://172.16.63.132:9000/login/oauth2/code/fan")
+                .redirectUri("http://192.168.137.114:10000/login/oauth2/code/fan")
                 .scope("fan")
                 .scope(OidcScopes.OPENID)
                 .scope(OidcScopes.PROFILE)
-                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+                .tokenSettings(tokenSettings)
+                .clientSettings(clientSettings)
                 .build();
+        RegisteredClient oidcRegisteredClient = registeredClientRepository.findByClientId(oidcClient.getClientId());
+        if (oidcRegisteredClient == null) {
+            registeredClientRepository.save(oidcClient);
+        }
 
         RegisteredClient pkceCilet = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("fan")
@@ -121,20 +140,22 @@ public class AuthorizationServerConfig {
                         .requireAuthorizationConsent(Boolean.TRUE)
                         .build())
                 .build();
-        InMemoryRegisteredClientRepository clientRepository = new InMemoryRegisteredClientRepository(pkceCilet);
-        clientRepository.save(oidcClient);
-        return clientRepository;
+        RegisteredClient pkceRegisteredClient = registeredClientRepository.findByClientId(pkceCilet.getClientId());
+        if (pkceRegisteredClient == null) {
+            registeredClientRepository.save(pkceCilet);
+        }
+        return registeredClientRepository;
     }
 
     @Bean
-    public InMemoryOAuth2AuthorizationService authorizationService() {
-        return new InMemoryOAuth2AuthorizationService();
+    public JdbcOAuth2AuthorizationService jdbcOAuth2AuthorizationService(JdbcTemplate jdbcTemplate, RegisteredClientRepository registeredClientRepository) {
+        return new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
     }
 
     @Bean
-    public InMemoryOAuth2AuthorizationConsentService authorizationConsentService() {
+    public JdbcOAuth2AuthorizationConsentService jdbcOAuth2AuthorizationConsentService(JdbcTemplate jdbcTemplate, RegisteredClientRepository registeredClientRepository) {
         // Will be used by the ConsentController
-        return new InMemoryOAuth2AuthorizationConsentService();
+        return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
     }
 
     @Bean
@@ -159,7 +180,7 @@ public class AuthorizationServerConfig {
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
-                .issuer("http://127.0.0.1:7000")
+                .issuer("http://127.0.0.1:10100")
                 .build();
     }
 
