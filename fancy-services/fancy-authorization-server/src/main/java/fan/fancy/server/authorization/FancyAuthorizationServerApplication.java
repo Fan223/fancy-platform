@@ -1,5 +1,6 @@
 package fan.fancy.server.authorization;
 
+import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -9,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Fan
  */
 @SpringBootApplication
+@EnableDubbo
 public class FancyAuthorizationServerApplication {
     static void main() {
         SpringApplication.run(FancyAuthorizationServerApplication.class);
