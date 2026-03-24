@@ -1,5 +1,6 @@
 package fan.fancy.server.authorization.handler;
 
+import fan.fancy.server.authorization.util.WebUtils;
 import fan.fancy.toolkit.http.Response;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,15 +34,12 @@ public class FancyAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private final LoginUrlAuthenticationEntryPoint loginUrlAuthenticationEntryPoint = new LoginUrlAuthenticationEntryPoint("/login");
 
     @Override
-    public void commence(HttpServletRequest request, @NonNull HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+    public void commence(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         String message = authException.getMessage();
         log.error("FancyAuthenticationEntryPoint: {}", message);
 
-        // 判断请求是否来自浏览器
-        boolean isBrowser = "GET".equals(request.getMethod())
-                && request.getHeader("Accept") != null
-                && request.getHeader("Accept").contains(MediaType.TEXT_HTML_VALUE);
-        if (isBrowser) {
+        // 判断请求是否来自浏览器, 如果是浏览器则重定向到登录页面, 否则返回 JSON 格式的错误信息
+        if (WebUtils.isBrowser(request)) {
             log.info("text");
             loginUrlAuthenticationEntryPoint.commence(request, response, authException);
         } else {

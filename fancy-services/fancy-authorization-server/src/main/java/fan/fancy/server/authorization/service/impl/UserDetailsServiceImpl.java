@@ -1,5 +1,6 @@
 package fan.fancy.server.authorization.service.impl;
 
+import fan.fancy.iam.api.service.UserRpcService;
 import lombok.AllArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.userdetails.User;
@@ -22,9 +23,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final UserRpcService userRpcService;
+
     @Override
     @NullMarked
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return new User("fan", passwordEncoder.encode("111111"), new ArrayList<>());
+//        UserBO userBO = userRpcService.getByUsername(username);
+//        return new User(userBO.getUsername(), passwordEncoder.encode(userBO.getPassword()), new ArrayList<>());
+        return new User(username, passwordEncoder.encode("111111"), new ArrayList<>());
     }
 }

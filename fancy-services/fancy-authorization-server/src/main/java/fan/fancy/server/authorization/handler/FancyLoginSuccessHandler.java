@@ -1,6 +1,8 @@
 package fan.fancy.server.authorization.handler;
 
+import fan.fancy.server.authorization.util.WebUtils;
 import fan.fancy.toolkit.http.Response;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -9,6 +11,8 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
@@ -20,18 +24,24 @@ import java.nio.charset.StandardCharsets;
  */
 @Slf4j
 @AllArgsConstructor
+@Component
 public class FancyLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JsonMapper jsonMapper;
 
+    private final AuthenticationSuccessHandler authenticationSuccessHandler = new SavedRequestAwareAuthenticationSuccessHandler();
+
     @Override
-    public void onAuthenticationSuccess(@NonNull HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+    public void onAuthenticationSuccess(@NonNull HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         Object principal = authentication.getPrincipal();
         log.error("FancyLoginSuccessHandler: {}", principal);
 
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding(StandardCharsets.UTF_8);
-
-        jsonMapper.writeValue(response.getOutputStream(), Response.success(String.valueOf(principal)));
+        if (WebUtils.isBrowser(request)) {
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding(StandardCharsets.UTF_8);
+            jsonMapper.writeValue(response.getOutputStream(), Response.success(String.valueOf(principal)));
+        } else {
+            authenticationSuccessHandler.onAuthenticationSuccess(request, response, authentication);
+        }
     }
 }
