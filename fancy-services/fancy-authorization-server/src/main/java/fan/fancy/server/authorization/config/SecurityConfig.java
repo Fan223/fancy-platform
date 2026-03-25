@@ -37,13 +37,15 @@ public class SecurityConfig {
 
         http.cors(Customizer.withDefaults())
                 // Form login handles the redirect to the login page from the authorization server filter chain
-                .formLogin(configurer -> configurer
-                        .successHandler(fancyLoginSuccessHandler)
-                        .failureHandler(fancyLoginFailureHandler)
-                );
-        http.oauth2Login(configurer -> configurer
-                        .successHandler(fancyLoginSuccessHandler)
-                        .failureHandler(fancyLoginFailureHandler))
+                .formLogin(Customizer.withDefaults());
+//                .formLogin(configurer -> configurer
+//                        .successHandler(fancyLoginSuccessHandler)
+//                        .failureHandler(fancyLoginFailureHandler)
+//                );
+        http.oauth2Login(Customizer.withDefaults())
+//        http.oauth2Login(configurer -> configurer
+//                        .successHandler(fancyLoginSuccessHandler)
+//                        .failureHandler(fancyLoginFailureHandler))
                 .oauth2Client(Customizer.withDefaults());
         http.exceptionHandling(configurer -> configurer
                 .authenticationEntryPoint(fancyAuthenticationEntryPoint));

@@ -5,13 +5,11 @@ import fan.fancy.toolkit.http.Response;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.json.JsonMapper;
@@ -25,13 +23,15 @@ import java.nio.charset.StandardCharsets;
  * @author Fan
  */
 @Component
-@AllArgsConstructor
 @Slf4j
-public class FancyAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class FancyAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
 
     private final JsonMapper jsonMapper;
 
-    private final LoginUrlAuthenticationEntryPoint loginUrlAuthenticationEntryPoint = new LoginUrlAuthenticationEntryPoint("/login");
+    public FancyAuthenticationEntryPoint(JsonMapper jsonMapper) {
+        this.jsonMapper = jsonMapper;
+        super("/login");
+    }
 
     @Override
     public void commence(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
@@ -41,7 +41,7 @@ public class FancyAuthenticationEntryPoint implements AuthenticationEntryPoint {
         // 判断请求是否来自浏览器, 如果是浏览器则重定向到登录页面, 否则返回 JSON 格式的错误信息
         if (WebUtils.isBrowser(request)) {
             log.info("text");
-            loginUrlAuthenticationEntryPoint.commence(request, response, authException);
+            super.commence(request, response, authException);
         } else {
             log.info("json");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
