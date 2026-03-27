@@ -1,7 +1,8 @@
 package fan.fancy.server.authorization.converter.impl;
 
-import fan.fancy.iam.api.bo.UserBO;
+import fan.fancy.iam.api.pojo.bo.UserBO;
 import fan.fancy.server.authorization.converter.OAuth2UserConverter;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,7 @@ import java.util.Map;
 public class GiteeOAuth2UserConverter implements OAuth2UserConverter {
 
     @Override
-    public UserBO convert(OAuth2User oAuth2User) {
+    public UserBO convert(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
         // 获取三方用户信息
         Map<String, Object> attributes = oAuth2User.getAttributes();
         // 转换至Oauth2ThirdAccount
