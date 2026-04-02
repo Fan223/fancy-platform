@@ -1,6 +1,6 @@
 package fan.fancy.server.authorization.service.impl;
 
-import fan.fancy.iam.api.service.UserRpcService;
+import fan.fancy.iam.api.pojo.bo.UserBO;
 import lombok.AllArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.userdetails.User;
@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 import java.util.ArrayList;
 
@@ -23,13 +24,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final UserRpcService userRpcService;
+    private final RestClient restClient;
 
     @Override
     @NullMarked
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//        UserBO userBO = userRpcService.getByUsername(username);
-//        return new User(userBO.getUsername(), passwordEncoder.encode(userBO.getPassword()), new ArrayList<>());
-        return new User(username, passwordEncoder.encode("111111"), new ArrayList<>());
+        UserBO userBO = restClient.get()
+                .uri("http://localhost:10200/iam/users/auth/" + username)
+                .retrieve()
+                .body(UserBO.class);
+        if (userBO == null) {
+            throw new UsernameNotFoundException(username);
+        }
+        return new User(username, passwordEncoder.encode(userBO.getUserIdentities().getFirst().getCredential()), new ArrayList<>());
     }
 }

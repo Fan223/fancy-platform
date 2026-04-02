@@ -25,16 +25,17 @@ public class GithubOAuth2UserConverter implements OAuth2UserConverter {
         UserIdentityDO userIdentityDO = new UserIdentityDO();
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
-        userIdentityDO.setIdentity(UserIdentityDO.IdentityType.valueOf(registrationId).getCode());
+        userIdentityDO.setType(1);
+        userIdentityDO.setIdentity(UserIdentityDO.IdentityType.valueOf(registrationId.toUpperCase()).getCode());
         // 获取ID作为身份标识, 后续登录是判断是否已存在
         userIdentityDO.setIdentifier(String.valueOf(attributes.get("id")));
         userIdentityDO.setCredential(userRequest.getAccessToken().getTokenValue());
 
         UserBO userBO = new UserBO();
-        userBO.getUserIdentities().add(userIdentityDO);
-        userBO.setNickname(String.valueOf(attributes.get("name")));
         userBO.setAvatar(String.valueOf(attributes.get("avatar_url")));
+        userBO.setNickname(String.valueOf(attributes.get("name")));
 
+        userBO.getUserIdentities().add(userIdentityDO);
         return userBO;
     }
 }
