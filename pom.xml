@@ -2,13 +2,10 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>fan</groupId>
-        <artifactId>fancy-parent</artifactId>
-        <version>4.0.4</version>
-    </parent>
+
+    <groupId>fan</groupId>
     <artifactId>fancy-platform</artifactId>
-    <version>${revision}</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
 
     <name>fancy-platform</name>
@@ -35,12 +32,14 @@
     </scm>
 
     <properties>
-        <revision>1.0.0</revision>
+        <maven.install.skip>true</maven.install.skip>
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
     <modules>
         <module>fancy-framework</module>
         <module>fancy-services</module>
         <module>fancy-samples</module>
+        <module>fancy-platform-parent</module>
     </modules>
 </project>

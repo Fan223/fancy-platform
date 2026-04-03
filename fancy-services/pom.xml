@@ -3,12 +3,18 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>fan</groupId>
-        <artifactId>fancy-platform</artifactId>
+        <artifactId>fancy-platform-parent</artifactId>
         <version>${revision}</version>
+        <relativePath>../fancy-platform-parent/pom.xml</relativePath>
     </parent>
     <artifactId>fancy-services</artifactId>
     <packaging>pom</packaging>
     <name>fancy-services</name>
+
+    <properties>
+        <maven.install.skip>true</maven.install.skip>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
 
     <modules>
         <module>fancy-admin-server</module>
