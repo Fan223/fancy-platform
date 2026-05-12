@@ -21,7 +21,7 @@ public class GithubOAuth2UserConverter implements OAuth2UserConverter {
     public UserBO convert(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
         // 获取三方用户信息
         Map<String, Object> attributes = oAuth2User.getAttributes();
-        // 转换至系统用户信息
+        // 转换至系统用户身份信息
         UserIdentityDO userIdentityDO = new UserIdentityDO();
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
@@ -36,6 +36,13 @@ public class GithubOAuth2UserConverter implements OAuth2UserConverter {
         userBO.setNickname(String.valueOf(attributes.get("name")));
 
         userBO.getUserIdentities().add(userIdentityDO);
+
+        Object email = attributes.get("email");
+        if (email != null) {
+            UserIdentityDO userIdentity = new UserIdentityDO();
+            userIdentity.setType(0);
+        }
+
         return userBO;
     }
 }
