@@ -1,7 +1,7 @@
 package fan.fancy.server.authorization.converter.impl;
 
-import fan.fancy.iam.api.pojo.bo.UserBO;
-import fan.fancy.iam.api.pojo.entity.UserIdentityDO;
+import fan.fancy.api.iam.pojo.bo.UserBO;
+import fan.fancy.api.iam.pojo.entity.UserIdentityDO;
 import fan.fancy.server.authorization.converter.OAuth2UserConverter;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -36,13 +36,6 @@ public class GithubOAuth2UserConverter implements OAuth2UserConverter {
         userBO.setNickname(String.valueOf(attributes.get("name")));
 
         userBO.getUserIdentities().add(userIdentityDO);
-
-        Object email = attributes.get("email");
-        if (email != null) {
-            UserIdentityDO userIdentity = new UserIdentityDO();
-            userIdentity.setType(0);
-        }
-
         return userBO;
     }
 }

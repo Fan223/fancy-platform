@@ -1,11 +1,13 @@
 package fan.fancy.starter.server.resource.autoconfigure.servlet;
 
+import fan.fancy.starter.server.resource.servlet.authentication.InternalAuthenticationFilter;
 import fan.fancy.starter.server.resource.servlet.authorize.FancyAuthorizeCustomizer;
 import fan.fancy.starter.server.resource.servlet.configurer.FancyResourceServerConfigurer;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -14,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * {@link ConditionalOnWebApplication.Type#SERVLET} 资源服务器自动配置类.
@@ -31,8 +34,11 @@ public class FancyResourceServerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public SecurityFilterChain defaultResourceServerSecurityFilterChain(HttpSecurity http,
-                                                                        FancyResourceServerConfigurer resourceServerConfigurer) {
+    public SecurityFilterChain defaultResourceServerSecurityFilterChain(
+            HttpSecurity http,
+            FancyResourceServerConfigurer resourceServerConfigurer,
+            ObjectProvider<InternalAuthenticationFilter> internalAuthenticationFilterProvider
+    ) {
         // 应用资源服务器配置
         http.apply(resourceServerConfigurer);
         http.authorizeHttpRequests(registry -> {
@@ -42,6 +48,12 @@ public class FancyResourceServerAutoConfiguration {
             // 其他请求都需要认证
             registry.anyRequest().authenticated();
         });
+
+        // 当 InternalAuthenticationFilter 存在时, 将其添加到过滤器链中, 放在 UsernamePasswordAuthenticationFilter 之前
+        InternalAuthenticationFilter internalTokenAuthFilter = internalAuthenticationFilterProvider.getIfAvailable();
+        if (internalTokenAuthFilter != null) {
+            http.addFilterBefore(internalTokenAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        }
         return http.build();
     }
 
@@ -63,5 +75,12 @@ public class FancyResourceServerAutoConfiguration {
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "fancy.security", name = "internal-token")
+    public InternalAuthenticationFilter defaultInternalAuthenticationFilter() {
+        return new InternalAuthenticationFilter();
     }
 }

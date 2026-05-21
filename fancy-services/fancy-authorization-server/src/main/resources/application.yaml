@@ -4,18 +4,16 @@ server:
 spring:
   application:
     name: fancy-authorization-server
-
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/fancy_iam?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&connectTimeout=5000&socketTimeout=10000
     username: root
-    password: fan223
+    password:
   cloud:
     nacos:
       server-addr: 127.0.0.1:8848
       username: nacos
       password:
-
   security:
     oauth2:
       client:
@@ -23,3 +21,7 @@ spring:
           github:
             client-id:
             client-secret:
+
+fancy:
+  security:
+    internal-token:
