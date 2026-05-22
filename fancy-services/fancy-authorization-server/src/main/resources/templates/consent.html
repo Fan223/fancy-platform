@@ -1,10 +1,125 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1" name="viewport">
-    <title>Custom consent page - Consent required</title>
-    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" rel="stylesheet">
+    <title>App permissions</title>
+    <link href="/assets/css/signin.css" rel="stylesheet" th:href="@{/assets/css/signin.css}"/>
+    <style>
+        body {
+            padding: 40px 20px;
+        }
+
+        .consent-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .consent-header {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #4a6fa5;
+        }
+
+        .consent-header h1 {
+            font-size: 20px;
+            font-weight: 500;
+            margin: 0 0 8px 0;
+            color: #ffffff;
+        }
+
+        .consent-info {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #bebebe;
+        }
+
+        .consent-info strong {
+            color: #ffffff;
+        }
+
+        .client-id {
+            color: #4a6fa5;
+        }
+
+        .user-code-alert {
+            background-color: #2d2a1f;
+            border: 1px solid #8b7a3a;
+            color: #d4c98a;
+            padding: 10px 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .scope-section {
+            margin-bottom: 16px;
+        }
+
+        .scope-section h3 {
+            font-size: 14px;
+            color: #888;
+            margin: 0 0 12px 0;
+            font-weight: 500;
+        }
+
+        .scope-item {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .scope-item input[type="checkbox"] {
+            margin-right: 10px;
+            width: 16px;
+            height: 16px;
+            accent-color: #4a6fa5;
+            vertical-align: middle;
+        }
+
+        .scope-item label {
+            color: #bebebe;
+            font-weight: 500;
+            cursor: pointer;
+            vertical-align: middle;
+        }
+
+        .scope-item .scope-description {
+            color: #888;
+            font-size: 13px;
+            margin: 6px 0 0 26px;
+        }
+
+        .scope-item.disabled {
+            opacity: 0.6;
+        }
+
+        .scope-item.disabled input {
+            cursor: not-allowed;
+        }
+
+        .scope-item.disabled label {
+            cursor: not-allowed;
+        }
+
+        .consent-actions {
+            margin-top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .consent-note {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-top: 24px;
+        }
+    </style>
     <script>
         function cancelConsent() {
             document.consent_form.reset();
@@ -13,92 +128,71 @@
     </script>
 </head>
 <body>
-<div class="container">
-    <div class="row py-5">
-        <h1 class="text-center text-primary">App permissions</h1>
+<div class="consent-container">
+    <div class="consent-header">
+        <h1>App permissions</h1>
     </div>
-    <div class="row">
-        <div class="col text-center">
-            <p>
-                The application
-                <span class="fw-bold text-primary" th:text="${clientId}"></span>
-                wants to access your account
-                <span class="fw-bold" th:text="${principalName}"></span>
-            </p>
-        </div>
-    </div>
-    <div class="row" th:if="${userCode}">
-        <div class="col text-center">
-            <p class="alert alert-warning">
-                You have provided the code
-                <span class="fw-bold" th:text="${userCode}"></span>.
-                Verify that this code matches what is shown on your device.
-            </p>
-        </div>
-    </div>
-    <div class="row pb-3">
-        <div class="col text-center">
-            <p>
-                The following permissions are requested by the above app.<br/>
-                Please review these and consent if you approve.
-            </p>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col text-center">
-            <form method="post" name="consent_form" th:action="${requestURI}">
-                <input name="client_id" th:value="${clientId}" type="hidden">
-                <input name="state" th:value="${state}" type="hidden">
-                <input name="user_code" th:if="${userCode}" th:value="${userCode}" type="hidden">
 
-                <div class="form-check py-1" th:each="scope: ${scopes}">
-                    <input class="form-check-input"
-                           name="scope"
-                           style="float: none"
-                           th:id="${scope.scope}"
-                           th:value="${scope.scope}"
-                           type="checkbox">
-                    <label class="form-check-label fw-bold px-2" th:for="${scope.scope}" th:text="${scope.scope}"></label>
-                    <p class="text-primary" th:text="${scope.description}"></p>
-                </div>
-
-                <p th:if="${not #lists.isEmpty(previouslyApprovedScopes)}">
-                    You have already granted the following permissions to the above app:
-                </p>
-                <div class="form-check py-1" th:each="scope: ${previouslyApprovedScopes}">
-                    <input checked
-                           class="form-check-input"
-                           disabled
-                           style="float: none"
-                           th:id="${scope.scope}"
-                           type="checkbox">
-                    <label class="form-check-label fw-bold px-2" th:for="${scope.scope}" th:text="${scope.scope}"></label>
-                    <p class="text-primary" th:text="${scope.description}"></p>
-                </div>
-
-                <div class="pt-3">
-                    <button class="btn btn-primary btn-lg" id="submit-consent" type="submit">
-                        Submit Consent
-                    </button>
-                </div>
-                <div class="pt-3">
-                    <button class="btn btn-link regular" id="cancel-consent" onclick="cancelConsent();" type="button">
-                        Cancel
-                    </button>
-                </div>
-            </form>
-        </div>
+    <div class="consent-info">
+        <p>
+            The application <span class="client-id" th:text="${clientId}"></span>
+            wants to access your account
+            <strong th:text="${principalName}"></strong>
+        </p>
     </div>
-    <div class="row pt-4">
-        <div class="col text-center">
-            <p>
-                <small>
-                    Your consent to provide access is required.<br/>
-                    If you do not approve, click Cancel, in which case no information will be shared with the app.
-                </small>
-            </p>
-        </div>
+
+    <div class="user-code-alert" th:if="${userCode}">
+        You have provided the code <strong th:text="${userCode}"></strong>.
+        Verify that this code matches what is shown on your device.
     </div>
+
+    <p style="color: #888; font-size: 13px; margin-bottom: 12px;">
+        The following permissions are requested by the above app. Please review these and consent if you approve.
+    </p>
+
+    <form method="post" name="consent_form" th:action="${requestURI}">
+        <input name="client_id" th:value="${clientId}" type="hidden">
+        <input name="state" th:value="${state}" type="hidden">
+        <input name="user_code" th:if="${userCode}" th:value="${userCode}" type="hidden">
+
+        <div class="scope-section" th:if="${scopes != null and not #lists.isEmpty(scopes)}">
+            <h3>Requested permissions</h3>
+            <div class="scope-item" th:each="scope: ${scopes}">
+                <input name="scope"
+                       th:id="${scope.scope}"
+                       th:value="${scope.scope}"
+                       type="checkbox">
+                <label th:for="${scope.scope}" th:text="${scope.scope}"></label>
+                <p class="scope-description" th:text="${scope.description}"></p>
+            </div>
+        </div>
+
+        <div class="scope-section" th:if="${not #lists.isEmpty(previouslyApprovedScopes)}">
+            <h3>Previously approved</h3>
+            <div class="scope-item disabled" th:each="scope: ${previouslyApprovedScopes}">
+                <input checked
+                       disabled
+                       th:id="${scope.scope}"
+                       type="checkbox">
+                <label th:for="${scope.scope}" th:text="${scope.scope}"></label>
+                <p class="scope-description" th:text="${scope.description}"></p>
+            </div>
+        </div>
+
+        <div class="consent-actions">
+            <button class="btn btn-primary" id="submit-consent" type="submit">
+                Submit Consent
+            </button>
+            <button class="btn btn-cancel" id="cancel-consent" onclick="cancelConsent();" type="button">
+                Cancel
+            </button>
+        </div>
+    </form>
+
+    <p class="consent-note">
+        Your consent to provide access is required.<br/>
+        If you do not approve, click Cancel, in which case no information will be shared with the app.
+    </p>
 </div>
 </body>
 </html>

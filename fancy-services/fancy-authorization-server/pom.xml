@@ -18,6 +18,11 @@
         </dependency>
         <dependency>
             <groupId>fan</groupId>
+            <artifactId>fancy-redis-starter</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>fan</groupId>
             <artifactId>fancy-iam-api</artifactId>
             <version>1.0.0</version>
         </dependency>

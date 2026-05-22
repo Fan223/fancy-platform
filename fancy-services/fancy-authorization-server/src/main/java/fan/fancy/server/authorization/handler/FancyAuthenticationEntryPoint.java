@@ -36,7 +36,7 @@ public class FancyAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPo
     @Override
     public void commence(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         String message = authException.getMessage();
-        log.error("FancyAuthenticationEntryPoint: {}", message);
+        log.error("FancyAuthenticationEntryPoint: {}-{}", message, request.getRequestURI());
 
         // 判断请求是否来自浏览器, 如果是浏览器则重定向到登录页面, 否则返回 JSON 格式的错误信息
         if (WebUtils.isBrowser(request)) {
@@ -49,7 +49,7 @@ public class FancyAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPo
             response.setCharacterEncoding(StandardCharsets.UTF_8);
             response.setHeader(HttpHeaders.WWW_AUTHENTICATE, message);
 
-            jsonMapper.writeValue(response.getOutputStream(), Response.fail(message));
+            jsonMapper.writeValue(response.getOutputStream(), Response.fail(HttpServletResponse.SC_UNAUTHORIZED, message));
         }
     }
 }

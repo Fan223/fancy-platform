@@ -6,7 +6,10 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import fan.fancy.server.authorization.federated.FederatedIdentityIdTokenCustomizer;
 import fan.fancy.server.authorization.handler.FancyAuthenticationEntryPoint;
+import fan.fancy.starter.redis.service.FancyRedisService;
+import fan.fancy.toolkit.lang.StringUtils;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -46,7 +49,11 @@ import java.util.UUID;
 @AllArgsConstructor
 public class AuthorizationServerConfig {
 
+    public static final String AUTHORIZATION_JWS = "authorization_jws";
+
     private final FancyAuthenticationEntryPoint fancyAuthenticationEntryPoint;
+
+    private final FancyRedisService redisService;
 
     private static KeyPair generateRsaKey() {
         KeyPair keyPair;
@@ -123,7 +130,7 @@ public class AuthorizationServerConfig {
         }
 
         RegisteredClient pkceCilet = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("fan")
+                .clientId("fancy")
                 // 公共客户端不需要 client_secret
                 .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
@@ -157,16 +164,26 @@ public class AuthorizationServerConfig {
     }
 
     @Bean
+    @SneakyThrows
     public JWKSource<SecurityContext> jwkSource() {
-        KeyPair keyPair = generateRsaKey();
-        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-        RSAKey rsaKey = new RSAKey.Builder(publicKey)
-                .privateKey(privateKey)
-                .keyID(UUID.randomUUID().toString())
-                .build();
+        // 先从 redis 获取
+        String jws = redisService.get(AUTHORIZATION_JWS, String.class);
+        if (StringUtils.isBlank(jws)) {
+            KeyPair keyPair = generateRsaKey();
+            RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+            RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+            RSAKey rsaKey = new RSAKey.Builder(publicKey)
+                    .privateKey(privateKey)
+                    .keyID(UUID.randomUUID().toString())
+                    .build();
+            // 生成 jws
+            JWKSet jwkSet = new JWKSet(rsaKey);
+            // 转为字符串存入 redis
+            redisService.set(AUTHORIZATION_JWS, jwkSet.toString(false));
+            return (jwkSelector, _) -> jwkSelector.select(jwkSet);
+        }
 
-        JWKSet jwkSet = new JWKSet(rsaKey);
+        JWKSet jwkSet = JWKSet.parse(jws);
         return (jwkSelector, _) -> jwkSelector.select(jwkSet);
     }
 

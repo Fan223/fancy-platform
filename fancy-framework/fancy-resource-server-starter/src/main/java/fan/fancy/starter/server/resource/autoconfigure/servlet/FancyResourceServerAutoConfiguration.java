@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -49,6 +50,8 @@ public class FancyResourceServerAutoConfiguration {
             registry.anyRequest().authenticated();
         });
 
+        // 禁用 CSRF
+        http.csrf(AbstractHttpConfigurer::disable);
         // 当 InternalAuthenticationFilter 存在时, 将其添加到过滤器链中, 放在 UsernamePasswordAuthenticationFilter 之前
         InternalAuthenticationFilter internalTokenAuthFilter = internalAuthenticationFilterProvider.getIfAvailable();
         if (internalTokenAuthFilter != null) {
