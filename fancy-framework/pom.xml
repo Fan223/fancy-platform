@@ -20,5 +20,6 @@
         <module>fancy-resource-server-starter</module>
         <module>fancy-validation-starter</module>
         <module>fancy-web-starter</module>
+        <module>fancy-datasource-starter</module>
     </modules>
 </project>
