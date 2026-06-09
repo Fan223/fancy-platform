@@ -44,6 +44,10 @@ public class DynamicDataSourceManager {
         this.provider = provider;
     }
 
+    /**
+     * 初始化方法, 在 Spring 容器完成依赖注入后调用, 通过 {@link ObjectProvider} 获取 {@link DataSourceProvider} 实例,
+     * 如果存在则加载数据源配置并添加到缓存中.
+     */
     @PostConstruct
     public void init() {
         this.dataSourceProvider = provider.getIfAvailable();
