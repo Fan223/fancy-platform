@@ -3,7 +3,9 @@ package fan.fancy.datasource.autoconfigure;
 import fan.fancy.datasource.aspect.DsAspect;
 import fan.fancy.datasource.core.DynamicDataSourceManager;
 import fan.fancy.datasource.core.DynamicRoutingDataSource;
-import fan.fancy.datasource.provider.DatasourceProvider;
+import fan.fancy.datasource.executor.DynamicSqlExecutor;
+import fan.fancy.datasource.executor.JdbcDynamicSqlExecutor;
+import fan.fancy.datasource.provider.DataSourceProvider;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -26,20 +28,9 @@ public class FancyDataSourceAutoConfiguration {
         return new DsAspect();
     }
 
-    /**
-     * 动态数据源管理器, 从 DatasourceProvider 加载数据源配置并创建数据源实例.
-     *
-     * @param objectProvider {@link ObjectProvider}
-     * @return {@link DynamicDataSourceManager}
-     */
     @Bean
-    public DynamicDataSourceManager dynamicDataSourceManager(ObjectProvider<DatasourceProvider> objectProvider) {
-        DynamicDataSourceManager manager = new DynamicDataSourceManager();
-        DatasourceProvider provider = objectProvider.getIfAvailable();
-        if (provider != null) {
-            provider.load().forEach(manager::add);
-        }
-        return manager;
+    public DynamicDataSourceManager dynamicDataSourceManager(ObjectProvider<DataSourceProvider> objectProvider) {
+        return new DynamicDataSourceManager(objectProvider);
     }
 
     /**
@@ -51,7 +42,12 @@ public class FancyDataSourceAutoConfiguration {
      */
     @Bean
     @Primary
-    public DataSource routingDataSource(DataSource defaultDataSource, DynamicDataSourceManager manager) {
+    public DataSource dynamicRoutingDataSource(DataSource defaultDataSource, DynamicDataSourceManager manager) {
         return new DynamicRoutingDataSource(defaultDataSource, manager);
+    }
+
+    @Bean
+    public DynamicSqlExecutor dynamicSqlExecutor(DynamicDataSourceManager manager) {
+        return new JdbcDynamicSqlExecutor(manager);
     }
 }

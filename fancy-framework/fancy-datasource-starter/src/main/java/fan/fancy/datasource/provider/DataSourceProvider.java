@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @author Fan
  */
-public interface DatasourceProvider {
+public interface DataSourceProvider {
 
     List<DataSourceModel> load();
 }

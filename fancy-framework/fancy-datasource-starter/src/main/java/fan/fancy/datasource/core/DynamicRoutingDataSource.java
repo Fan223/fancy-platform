@@ -4,7 +4,6 @@ import fan.fancy.datasource.context.DataSourceContextHolder;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 import javax.sql.DataSource;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -14,18 +13,15 @@ import java.util.Map;
  */
 public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
 
-    public DynamicRoutingDataSource(DataSource defaultDataSource, DynamicDataSourceManager manager) {
-        Map<Object, Object> targetMap = new HashMap<>();
-        // 默认数据源(配置文件里配置)
-        targetMap.put("default", defaultDataSource);
-        // 注册动态数据源
-        targetMap.putAll(manager.getAll());
+    private final DynamicDataSourceManager manager;
 
+    public DynamicRoutingDataSource(DataSource defaultDataSource, DynamicDataSourceManager manager) {
+        this.manager = manager;
         // 设置默认数据源
         super.setDefaultTargetDataSource(defaultDataSource);
-        // 设置所有可选数据源
-        super.setTargetDataSources(targetMap);
-        // 初始化 AbstractRoutingDataSource
+        // 设置数据源为空 Map 以满足 null 校验, 实际不使用该快照机制, 由 determineTargetDataSource 方法动态查找, 以支持动态刷新
+        super.setTargetDataSources(Map.of());
+        // 初始化
         super.afterPropertiesSet();
     }
 
@@ -37,5 +33,27 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
     @Override
     protected Object determineCurrentLookupKey() {
         return DataSourceContextHolder.peek();
+    }
+
+    /**
+     * 核心路由方法, 实时委托 {@link DynamicDataSourceManager} 查找, 天然支持动态刷新, 不存在时则走前面设置的默认数据源.
+     *
+     * @return {@link DataSource}
+     */
+    @Override
+    protected DataSource determineTargetDataSource() {
+        Object key = determineCurrentLookupKey();
+        if (key != null) {
+            DataSource ds = manager.get((String) key);
+            if (ds != null) {
+                return ds;
+            }
+        }
+
+        DataSource defaultDs = getResolvedDefaultDataSource();
+        if (defaultDs == null) {
+            throw new IllegalStateException("No default DataSource configured in DynamicRoutingDataSource");
+        }
+        return defaultDs;
     }
 }
