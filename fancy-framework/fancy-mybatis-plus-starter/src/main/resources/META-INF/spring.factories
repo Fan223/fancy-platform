@@ -1,2 +1,0 @@
-org.springframework.boot.EnvironmentPostProcessor=\
-    fan.fancy.starter.mybatis.plus.bootstrap.FancyP6SpyEnvironmentPostProcessor
