@@ -1,17 +1,16 @@
 package fan.fancy.server.authorization.service.impl;
 
-import fan.fancy.api.iam.pojo.bo.UserBO;
-import fan.fancy.api.iam.service.UserApiService;
+import fan.fancy.api.auth.pojo.enums.IdentityType;
+import fan.fancy.server.authorization.pojo.entity.UserIdentityDO;
+import fan.fancy.server.authorization.service.UserIdentityService;
 import lombok.AllArgsConstructor;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 
 /**
  * {@link UserDetailsService} 实现类.
@@ -22,17 +21,16 @@ import java.util.ArrayList;
 @AllArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final PasswordEncoder passwordEncoder;
-
-    private final UserApiService userApiService;
+    private final UserIdentityService userIdentityService;
 
     @Override
     @NullMarked
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserBO userBO = userApiService.getByIdentifier(username);
-        if (userBO == null) {
+        UserIdentityDO identity = userIdentityService.getByIdentifier(IdentityType.USERNAME, username);
+        if (identity == null) {
             throw new UsernameNotFoundException(username);
         }
-        return new User(username, passwordEncoder.encode(userBO.getUserIdentities().getFirst().getCredential()), new ArrayList<>());
+        return new User(username, identity.getCredentialHash(),
+                AuthorityUtils.NO_AUTHORITIES);
     }
 }

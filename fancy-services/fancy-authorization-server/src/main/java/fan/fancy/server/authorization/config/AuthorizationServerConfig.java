@@ -6,8 +6,8 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import fan.fancy.server.authorization.federated.FederatedIdentityIdTokenCustomizer;
 import fan.fancy.server.authorization.handler.FancyAuthenticationEntryPoint;
-import fan.fancy.starter.redis.service.FancyRedisService;
 import fan.fancy.toolkit.lang.StringUtils;
+import fancy.starter.redis.service.RedisService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
@@ -53,7 +53,7 @@ public class AuthorizationServerConfig {
 
     private final FancyAuthenticationEntryPoint fancyAuthenticationEntryPoint;
 
-    private final FancyRedisService redisService;
+    private final RedisService redisService;
 
     private static KeyPair generateRsaKey() {
         KeyPair keyPair;

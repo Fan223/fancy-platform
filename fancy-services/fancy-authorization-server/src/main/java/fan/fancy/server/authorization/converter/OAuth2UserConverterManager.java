@@ -1,6 +1,5 @@
 package fan.fancy.server.authorization.converter;
 
-import fan.fancy.api.iam.pojo.bo.UserBO;
 import lombok.AllArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -10,7 +9,7 @@ import org.springframework.util.ObjectUtils;
 import java.util.Map;
 
 /**
- * 1
+ * OAuth2 用户转换器管理.
  *
  * @author Fan
  */
@@ -23,8 +22,8 @@ public class OAuth2UserConverterManager {
      */
     private final Map<String, OAuth2UserConverter> oAuth2UserConverterMap;
 
-    public UserBO convert(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
-        // 获取三方登录配置的registrationId, 即配置文件中的 spring.security.oauth2.client.registration, 这里将他当做登录方式
+    public OAuth2User convert(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
+        // 获取三方登录配置的registrationId, 即配置文件中的 spring.security.oauth2.client.registration
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         return getInstance(registrationId).convert(userRequest, oAuth2User);
     }

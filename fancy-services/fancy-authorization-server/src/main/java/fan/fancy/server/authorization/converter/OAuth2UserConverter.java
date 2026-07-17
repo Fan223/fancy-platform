@@ -1,6 +1,5 @@
 package fan.fancy.server.authorization.converter;
 
-import fan.fancy.api.iam.pojo.bo.UserBO;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
@@ -11,5 +10,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
  */
 public interface OAuth2UserConverter {
 
-    UserBO convert(OAuth2UserRequest userRequest, OAuth2User oAuth2User);
+    /**
+     * 转换 OAuth2 用户信息. 第三方登录用户创建流程暂未实现, 返回 null 即可.
+     */
+    OAuth2User convert(OAuth2UserRequest userRequest, OAuth2User oAuth2User);
 }

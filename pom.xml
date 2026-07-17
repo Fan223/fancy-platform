@@ -31,15 +31,9 @@
         <tag/>
     </scm>
 
-    <properties>
-        <maven.install.skip>true</maven.install.skip>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
-
     <modules>
-        <module>fancy-framework</module>
+        <module>fancy-auth-api</module>
         <module>fancy-services</module>
-        <module>fancy-samples</module>
         <module>fancy-platform-parent</module>
     </modules>
 </project>
