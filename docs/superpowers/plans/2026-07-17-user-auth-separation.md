@@ -242,7 +242,7 @@ git commit -m "feat(auth-api): create fancy-auth-api module and IdentityType enu
 ```java
 package fan.fancy.api.auth.pojo.dto;
 
-import fan.fancy.api.auth.pojo.enums.IdentityType;
+import fan.fancy.api.auth.pojo.enums.Identifier;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -351,7 +351,7 @@ git commit -m "feat(auth-api): add AuthBindRequest and ChangePasswordRequest DTO
 ```java
 package fan.fancy.api.auth.service;
 
-import fan.fancy.api.auth.pojo.dto.AuthBindRequest;
+import fan.fancy.api.auth.pojo.dto.UserIdentityDTO;
 import fan.fancy.api.auth.pojo.dto.ChangePasswordRequest;
 import fancy.boot.core.http.Response;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -458,7 +458,7 @@ git commit -m "feat(auth-api): add AuthUserApi feign client"
 package fan.fancy.server.authorization.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import fan.fancy.api.auth.pojo.enums.IdentityType;
+import fan.fancy.api.auth.pojo.enums.Identifier;
 import fancy.starter.mybatis.plus.entity.MetaDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -505,7 +505,7 @@ public class UserIdentityDO extends MetaDO {
 package fan.fancy.server.authorization.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import fan.fancy.api.auth.pojo.enums.IdentityType;
+import fan.fancy.api.auth.pojo.enums.Identifier;
 import fan.fancy.server.authorization.pojo.entity.UserIdentityDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -563,7 +563,7 @@ git commit -m "feat(auth): add user_identity entity and mapper; remove iam-api d
 ```java
 package fan.fancy.server.authorization.service;
 
-import fan.fancy.api.auth.pojo.enums.IdentityType;
+import fan.fancy.api.auth.pojo.enums.Identifier;
 import fan.fancy.server.authorization.pojo.entity.UserIdentityDO;
 
 /**
@@ -592,7 +592,7 @@ public interface UserIdentityService {
 ```java
 package fan.fancy.server.authorization.service.impl;
 
-import fan.fancy.api.auth.pojo.enums.IdentityType;
+import fan.fancy.api.auth.pojo.enums.Identifier;
 import fan.fancy.server.authorization.mapper.UserIdentityMapper;
 import fan.fancy.server.authorization.pojo.entity.UserIdentityDO;
 import org.junit.jupiter.api.Test;
@@ -649,7 +649,7 @@ Expected: 编译失败（`UserIdentityServiceImpl` 不存在）。
 ```java
 package fan.fancy.server.authorization.service.impl;
 
-import fan.fancy.api.auth.pojo.enums.IdentityType;
+import fan.fancy.api.auth.pojo.enums.Identifier;
 import fan.fancy.server.authorization.mapper.UserIdentityMapper;
 import fan.fancy.server.authorization.pojo.entity.UserIdentityDO;
 import fan.fancy.server.authorization.service.UserIdentityService;
@@ -689,7 +689,7 @@ Expected: Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
 ```java
 package fan.fancy.server.authorization.service.impl;
 
-import fan.fancy.api.auth.pojo.enums.IdentityType;
+import fan.fancy.api.auth.pojo.enums.Identifier;
 import fan.fancy.server.authorization.pojo.entity.UserIdentityDO;
 import fan.fancy.server.authorization.service.UserIdentityService;
 import org.junit.jupiter.api.Test;
@@ -750,7 +750,7 @@ class UserDetailsServiceImplTest {
 ```java
 package fan.fancy.server.authorization.service.impl;
 
-import fan.fancy.api.auth.pojo.enums.IdentityType;
+import fan.fancy.api.auth.pojo.enums.Identifier;
 import fan.fancy.server.authorization.pojo.entity.UserIdentityDO;
 import fan.fancy.server.authorization.service.UserIdentityService;
 import lombok.AllArgsConstructor;
@@ -823,9 +823,9 @@ git commit -m "feat(auth): refactor UserDetailsService to query local user_ident
 ```java
 package fan.fancy.server.authorization.service.impl;
 
-import fan.fancy.api.auth.pojo.dto.AuthBindRequest;
+import fan.fancy.api.auth.pojo.dto.UserIdentityDTO;
 import fan.fancy.api.auth.pojo.dto.ChangePasswordRequest;
-import fan.fancy.api.auth.pojo.enums.IdentityType;
+import fan.fancy.api.auth.pojo.enums.Identifier;
 import fan.fancy.server.authorization.pojo.entity.UserIdentityDO;
 import fan.fancy.server.authorization.service.UserIdentityService;
 import org.junit.jupiter.api.Test;
@@ -950,7 +950,7 @@ Expected: 编译失败（`AuthUserServiceImpl` 不存在）。
 ```java
 package fan.fancy.server.authorization.service;
 
-import fan.fancy.api.auth.pojo.dto.AuthBindRequest;
+import fan.fancy.api.auth.pojo.dto.UserIdentityDTO;
 import fan.fancy.api.auth.pojo.dto.ChangePasswordRequest;
 
 /**
@@ -983,9 +983,9 @@ public interface AuthUserService {
 ```java
 package fan.fancy.server.authorization.service.impl;
 
-import fan.fancy.api.auth.pojo.dto.AuthBindRequest;
+import fan.fancy.api.auth.pojo.dto.UserIdentityDTO;
 import fan.fancy.api.auth.pojo.dto.ChangePasswordRequest;
-import fan.fancy.api.auth.pojo.enums.IdentityType;
+import fan.fancy.api.auth.pojo.enums.Identifier;
 import fan.fancy.server.authorization.pojo.entity.UserIdentityDO;
 import fan.fancy.server.authorization.service.AuthUserService;
 import fan.fancy.server.authorization.service.UserIdentityService;
@@ -1047,7 +1047,7 @@ Expected: Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
 ```java
 package fan.fancy.server.authorization.controller;
 
-import fan.fancy.api.auth.pojo.dto.AuthBindRequest;
+import fan.fancy.api.auth.pojo.dto.UserIdentityDTO;
 import fan.fancy.api.auth.pojo.dto.ChangePasswordRequest;
 import fan.fancy.server.authorization.service.AuthUserService;
 import fancy.boot.core.http.Response;
@@ -1303,8 +1303,8 @@ public class UserIdentityDO extends MetaDO {
 修改 `fancy-space/fancy-services/fancy-iam/src/main/java/.../service/impl/UserServiceImpl.java`，在 `createUser` 方法**保存业务用户后**追加调用：
 
 ```java
-import fan.fancy.api.auth.pojo.dto.AuthBindRequest;
-import fan.fancy.api.auth.pojo.enums.IdentityType;
+import fan.fancy.api.auth.pojo.dto.UserIdentityDTO;
+import fan.fancy.api.auth.pojo.enums.Identifier;
 import fan.fancy.api.auth.service.AuthUserApi;
 ```
 
@@ -1315,7 +1315,7 @@ import fan.fancy.api.auth.service.AuthUserApi;
 @Transactional
 public UserVO createUser(UserDTO dto) {
     // 1. 创建 IAM 业务用户（已有逻辑）
-    UserDO userDO = ...;
+    UserDO userDO = ...
     userMapper.insert(userDO);
 
     // 2. 调 auth 服务绑定认证账号
@@ -1327,7 +1327,7 @@ public UserVO createUser(UserDTO dto) {
     authUserApi.bind(bindReq);
 
     return ...;
-}
+
 ```
 
 > **注意**：若 `auth.bind` 抛异常，`@Transactional` 会回滚 IAM 业务用户，符合"接受最终不一致"（详见 spec §6）。**当前实现为强一致**，因为两步在同一事务里——`auth.bind` 网络异常将整体回滚。这超出 spec §6 的"最终一致"叙述，但更安全。**此选择需用户确认**（如不同意可改为：bind 失败不抛业务异常，仅记录日志，由调用方补偿）。

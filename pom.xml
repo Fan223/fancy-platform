@@ -32,7 +32,6 @@
     </scm>
 
     <modules>
-        <module>fancy-auth-api</module>
         <module>fancy-services</module>
         <module>fancy-platform-parent</module>
     </modules>

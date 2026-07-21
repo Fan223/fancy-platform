@@ -13,7 +13,7 @@
     <dependencies>
         <dependency>
             <groupId>fan</groupId>
-            <artifactId>fancy-auth-api</artifactId>
+            <artifactId>fancy-iam-api</artifactId>
             <version>1.0.0</version>
         </dependency>
 
